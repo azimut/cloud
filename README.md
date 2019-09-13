@@ -2,7 +2,7 @@
 
 Common Lisp helpers for CFFI interactions with CSOUND.
 
-Depends on csound cffi fork at azimut/csound.
+Depends on csound cffi [fork](https://github.com/azimut/csound)
 
 ## Usage
 ```
