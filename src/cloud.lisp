@@ -35,6 +35,33 @@
   (format nil "~{~%~a~%~}"
           (alexandria:flatten (remove-if #'null rest))))
 
+(defvar *scheduler* (make-instance 'scheduler:scheduler))
+
+(define-compiler-macro sample (number)
+  (if (constantp number)
+      (coerce (eval number) 'double-float)
+      `(coerce ,number 'double-float)))
+
+(declaim (inline at))
+(defun at (time function &rest arguments)
+  "Schedule FUNCTION to be called with the supplied ARGUMENTS from the
+real-time thread at TIME samples."
+  (scheduler:sched-add *scheduler*
+                       (sample time) function arguments))
+
+(declaim (inline now))
+(defun now ()
+  (scheduler:sched-time *scheduler*))
+
+(defun midihz (midi)
+  (* (expt 2 (/ (- midi 69) 12)) 440f0))
+
+(defvar *TEMPO* 1)      ; TODO
+(defvar *SAMPLE-RATE* 1); TODO
+;; TODO
+(defun spb (time)
+  time)
+
 ;; https://github.com/csound/csound/blob/2709c99b851a17b5476903bcc50af83f43e12446/OOps/aops.c
 (defun keynum->pch (midi)
   (let* (;; Lowest midi note is 3.00 in oct & pch formats
@@ -555,6 +582,7 @@
 ;; TODO: ew
 (defun start-csound (orchestra)
   (declare (type orc orchestra))
+  ;;(scheduler:sched-run *scheduler*)
   (with-slots (name orc sco globals) orchestra
     (let ((server-up-p *c*))
       (unless server-up-p

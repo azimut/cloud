@@ -11,6 +11,7 @@
                #:cl-arrows
                #:cl-ppcre
                #:csound
+               #:scheduler
                #:serapeum
                #:str)
   :components ((:file "package")
