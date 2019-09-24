@@ -14,7 +14,6 @@ CLOUD> (play-pluck 70 2)
 
 ## TODO
 
-- Add (at,now,sample,spb,*tempo*,*sample-rate*) for arpeggios
 - Clean that macro.
 - There are ways to tell cffi to the allocation/conversion automatically
 - Make an instrument library abstraction, so I can push an ORC with a custom set of instruments...nvm, tables are to thightly related to instruments combine or compose them won't be that easy...

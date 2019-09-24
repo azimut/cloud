@@ -37,17 +37,10 @@
 
 (defvar *scheduler* (make-instance 'scheduler:scheduler))
 
-(define-compiler-macro sample (number)
-  (if (constantp number)
-      (coerce (eval number) 'double-float)
-      `(coerce ,number 'double-float)))
-
-(declaim (inline at))
-(defun at (time function &rest arguments)
-  "Schedule FUNCTION to be called with the supplied ARGUMENTS from the
-real-time thread at TIME samples."
-  (scheduler:sched-add *scheduler*
-                       (sample time) function arguments))
+(defmacro at (time function &rest arguments)
+  `(scheduler:sched-add *scheduler*
+                        (+ ,time (scheduler:sched-time *scheduler*))
+                        ,function ,@arguments))
 
 (declaim (inline now))
 (defun now ()
@@ -55,12 +48,6 @@ real-time thread at TIME samples."
 
 (defun midihz (midi)
   (* (expt 2 (/ (- midi 69) 12)) 440f0))
-
-(defvar *TEMPO* 1)      ; TODO
-(defvar *SAMPLE-RATE* 1); TODO
-;; TODO
-(defun spb (time)
-  time)
 
 ;; https://github.com/csound/csound/blob/2709c99b851a17b5476903bcc50af83f43e12446/OOps/aops.c
 (defun keynum->pch (midi)
@@ -185,12 +172,14 @@ real-time thread at TIME samples."
                                                  (list k 127) ;; dummy value...
                                                  (list k (intern (symbol-name k))))))
                       :do
-                         (at (+ now (* *SAMPLE-RATE* (* (SAMPLE I) (SPB *TEMPO*))))
-                             #'playcsound-key ,i duration keynum
-                             ,@(loop :for (k v) :on rest :by #'cddr :append
-                                        (if (eq k :keynum)
-                                            (list k 127) ;; dummy value...
-                                            (list k (intern (symbol-name k)))))))
+                         (scheduler:sched-add
+                          *scheduler*
+                          (+ i (scheduler:sched-time *scheduler*))
+                          #'playcsound-key ,i duration keynum
+                          ,@(loop :for (k v) :on rest :by #'cddr :append
+                                     (if (eq k :keynum)
+                                         (list k 127) ;; dummy value...
+                                         (list k (intern (symbol-name k)))))))
                 NIL)))
           ;;--------------------------------------------------
           ;; FREQ - Handles normal instruments with a single note in Hz
@@ -233,16 +222,18 @@ real-time thread at TIME samples."
                                                        (when (not (eq :freq x))
                                                          (list x k))))))
                       :do
-                         (at (+ now (* *SAMPLE-RATE* (* (SAMPLE I) (SPB *TEMPO*))))
-                             #',fname keynum duration
-                             ,@(remove-if
-                                #'null
-                                (loop :for (x y) :on rest :by #'cddr
-                                      :append
-                                         (let* ((sn (symbol-name x))
-                                                (k  (intern sn)))
-                                           (when (not (eq :freq x))
-                                             (list x k)))))))
+                         (scheduler:sched-add
+                          *scheduler*
+                          (+ i (scheduler:sched-time *scheduler*))
+                          #',fname keynum duration
+                          ,@(remove-if
+                             #'null
+                             (loop :for (x y) :on rest :by #'cddr
+                                   :append
+                                      (let* ((sn (symbol-name x))
+                                             (k  (intern sn)))
+                                        (when (not (eq :freq x))
+                                          (list x k)))))))
                 NIL)))
           ;;--------------------------------------------------
           ((position :midi rest)
@@ -284,12 +275,14 @@ real-time thread at TIME samples."
                                              (list k 127) ;; dummy value...
                                              (list k (intern (symbol-name k))))))
                   :do
-                     (at (+ now (* *SAMPLE-RATE* (* (SAMPLE I) (SPB *TEMPO*))))
-                         #'playcsound-midi ,i duration midi
-                         ,@(loop :for (k v) :on rest :by #'cddr :append
-                                    (if (eq k :midi)
-                                        (list k 127) ;; dummy value...
-                                        (list k (intern (symbol-name k)))))))
+                     (scheduler:sched-add
+                      *scheduler*
+                      (+ i (scheduler:sched-time *scheduler*))
+                      #'playcsound-midi ,i duration midi
+                      ,@(loop :for (k v) :on rest :by #'cddr :append
+                                 (if (eq k :midi)
+                                     (list k 127) ;; dummy value...
+                                     (list k (intern (symbol-name k)))))))
                 NIL)))
           ;;--------------------------------------------------
           (t

@@ -41,3 +41,29 @@
 (make-play crash "i4"
            :amp 2500 :pulse .25 :rhy 34 :env1 12 :env2 15
            :pan1 .2 :pan2 .2 :keynum 80)
+
+;; BASS
+
+(make-play bass "i1"
+           :fco1 .1  :fco2 .3
+           :res1 .2  :res2 .2
+           :env1 .1  :env2 .4
+           :dec1 .05 :dec2 .8
+           :acc1 0   :acc2 0
+           :bars 120
+           :amp .2
+           :keynum 60)
+
+;; ASYNTH
+
+(make-play asynth "i1.1"
+           :amp .5
+           :keynum 60
+           :semi 1
+           :fine 1
+           :vcf1 1000 :vcf2 200
+           :rez 10
+           :wav1 2 :wav2 2
+           :wave 2
+           :rate1 .25 :rate2 .3
+           :ring .75)
