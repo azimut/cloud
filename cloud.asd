@@ -15,4 +15,10 @@
                #:serapeum
                #:str)
   :components ((:file "package")
-               (:file "cloud")))
+               (:file "cloud")
+               (:file "parser")
+               (:file "merger")
+               (:file "server")
+               (:file "queries")
+               (:file "player")
+               (:file "default-instruments")))

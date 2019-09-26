@@ -12,8 +12,13 @@ CLOUD> (make-play pluck  "i2" :p4 0 :keynum 60)
 CLOUD> (play-pluck 70 2)
 ```
 
-## TODO
+* merger.lisp: has helpers to merge 2 or more different orchestra objects into a new one.
+* player.lisp: utilities that create the -play and -play-arp helpers from an orchestra
+* server.lisp: start and stop server helpers
+* queries.lisp: accessors for orchestra objects
 
+## TODO
+- the ahead of time scheduler of scheduler is ... complicated to work with...I won't use (at or -arp) at the moment
 - Clean that macro.
 - There are ways to tell cffi to the allocation/conversion automatically
 - Make an instrument library abstraction, so I can push an ORC with a custom set of instruments...nvm, tables are to thightly related to instruments combine or compose them won't be that easy...
