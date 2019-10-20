@@ -180,25 +180,33 @@
                 (loop :for keynum :in (cdr keynums)
                       :for i :from offset :by offset
                       :with now = (now)
-                      :initially (,fname (car keynums) duration 0
-                                         ,@(remove-if
-                                            #'null
-                                            (loop :for (x y) :on rest :by #'cddr
-                                                  :append
-                                                     (let* ((sn (symbol-name x))
-                                                            (k  (intern sn)))
-                                                       (when (not (eq :freq x))
-                                                         (list x k))))))
+                      :initially (playcsound-freq
+                                  ,i
+                                  duration
+                                  0
+                                  (car keynums)
+                                  ,@(remove-if
+                                     #'null
+                                     (loop :for (x y) :on rest :by #'cddr
+                                           :append
+                                              (let* ((sn (symbol-name x))
+                                                     (k  (intern sn)))
+                                                (when (not (eq :freq x))
+                                                  (list x k))))))
                       :do
-                         (,fname keynum duration i
-                                 ,@(remove-if
-                                    #'null
-                                    (loop :for (x y) :on rest :by #'cddr
-                                          :append
-                                             (let* ((sn (symbol-name x))
-                                                    (k  (intern sn)))
-                                               (when (not (eq :freq x))
-                                                 (list x k)))))))
+                         (playcsound-freq
+                          ,i
+                          duration
+                          i
+                          keynum
+                          ,@(remove-if
+                             #'null
+                             (loop :for (x y) :on rest :by #'cddr
+                                   :append
+                                      (let* ((sn (symbol-name x))
+                                             (k  (intern sn)))
+                                        (when (not (eq :freq x))
+                                          (list x k)))))))
                 NIL)))
           ;;--------------------------------------------------
           ((position :midi rest)
