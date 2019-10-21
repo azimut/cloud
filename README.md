@@ -5,19 +5,33 @@ Common Lisp helpers for CFFI interactions with CSOUND.
 Depends on csound cffi [fork](https://github.com/azimut/csound)
 
 ## Usage
+* server.lisp: start and stop server helpers
+* player.lisp: utilities that create the -play and -play-arp helpers from an orchestra
 ```
 CLOUD> (start-csound (get-orchestra :xanadu))
 CLOUD> (start-thread)
 CLOUD> (make-play pluck  "i2" :p4 0 :keynum 60)
 CLOUD> (play-pluck 70 2)
 ```
-
-* merger.lisp: has helpers to merge 2 or more different orchestra objects into a new one.
-* player.lisp: utilities that create the -play and -play-arp helpers from an orchestra
-* server.lisp: start and stop server helpers
+* merger.lisp: (experimental) has helpers to merge 2 or more different orchestra objects into a new one.
+```
+CLOUD> (sco (merge-orcs (get-orchestra :kkel) (get-orchestra :xanadu)))
+"f1 0 8192 10 1
+ f2 0 8192 11 1
+ f3 0 8192 -12 20.0
+ "
+```
 * queries.lisp: accessors for orchestra objects
+```
+CLOUD> (list-orcs)
+(:DRUMKIT :BASS :ASYNTH :KKEL :TRAPPED :XANADU)
+```
 
 ## TODO
+- Add guards/types? for the arguments to avoid float overflows or crashes
+- Might be use structs/objects for instrument definitions? should be easier to write thigs for it???
+- Support range for make-play arguments (clamp?
+- Better server helpers...restart..query...object
 - the ahead of time scheduler of scheduler is ... complicated to work with...I won't use (at or -arp) at the moment
 - Clean that macro.
 - There are ways to tell cffi to the allocation/conversion automatically
@@ -42,4 +56,3 @@ things with (some) params, appears to happen on the perform thread
 ## License
 
 MIT
-
