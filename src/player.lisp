@@ -179,7 +179,6 @@
                                                      (list k y))))))
                 (loop :for keynum :in (cdr keynums)
                       :for i :from offset :by offset
-                      :with now = (now)
                       :initially (playcsound-freq
                                   ,i
                                   duration
