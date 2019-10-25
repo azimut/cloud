@@ -135,7 +135,6 @@
                          (optimize speed))
                 (loop :for keynum :in (cdr keynums)
                       :for i :from offset :by offset
-                      :with now = (now)
                       :initially (playcsound-key
                                   ,i duration 0 (car keynums)
                                   ,@(loop :for (k v) :on rest :by #'cddr :append
