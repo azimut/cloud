@@ -6,10 +6,12 @@ Depends on csound cffi [fork](https://github.com/azimut/csound)
 
 ## Usage
 * server.lisp: start and stop server helpers
-* player.lisp: utilities that create the -play and -play-arp helpers from an orchestra
 ```
 CLOUD> (start-csound (get-orchestra :xanadu))
 CLOUD> (start-thread)
+```
+* player.lisp: utilities that create the -play and -play-arp helpers from an orchestra
+```
 CLOUD> (make-play pluck  "i2" :p4 0 :keynum 60)
 CLOUD> (play-pluck 70 2)
 ```
