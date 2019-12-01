@@ -37,12 +37,13 @@
     ;; Init fN wave tables for this ORC
     (csound:csoundreadscore *c* sco)))
 
+(cffi:defcallback newthread :int ((data :pointer))
+  (csound:csoundperform data))
+
 (defun start-thread ()
-  (setf *thread*
-        (bt:make-thread
-         (lambda ()
-           (loop :for frame = (csound:csoundperformksmps *c*)
-                 :while (= frame 0))))))
+  (when *c*
+    (csound::csoundcreatethread (cffi:get-callback 'newthread) *c*)))
 
 (defun stop-thread ()
-  (bt:destroy-thread *thread*))
+  ;;(bt:destroy-thread *thread*)
+  )
