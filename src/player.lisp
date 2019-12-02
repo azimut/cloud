@@ -115,24 +115,27 @@
                                                            (k  (intern sn)))
                                                       (when (not (eq :keynum x))
                                                         (list k y))))))
-                (declare (type (or integer list) keynum) (number duration)
-                         (optimize speed))
+                (declare (type (or integer list) keynum)
+                         (type number duration)
+                         (optimize (speed 3)))
                 (playcsound-key ,i duration 0 keynum
                                 ,@(loop :for (k v) :on rest :by #'cddr :append
                                            (if (eq k :keynum)
                                                (list k 127) ;; dummy value...
                                                (list k (intern (symbol-name k)))))))
-              (defun ,fnamearp (keynums duration offset
-                                &key ,@(remove-if
-                                        #'null
-                                        (loop :for (x y) :on rest :by #'cddr
-                                              :collect
-                                                 (let* ((sn (symbol-name x))
-                                                        (k  (intern sn)))
-                                                   (when (not (eq :keynum x))
-                                                     (list k y))))))
-                (declare (list keynums) (number duration offset)
-                         (optimize speed))
+              (defun ,fnamearp
+                  (keynums duration offset
+                   &key ,@(remove-if
+                           #'null
+                           (loop :for (x y) :on rest :by #'cddr
+                                 :collect
+                                    (let* ((sn (symbol-name x))
+                                           (k  (intern sn)))
+                                      (when (not (eq :keynum x))
+                                        (list k y))))))
+                (declare (type list keynums)
+                         (type number duration offset)
+                         (optimize (speed 3)))
                 (loop :for keynum :in (cdr keynums)
                       :for i :from offset :by offset
                       :initially (playcsound-key

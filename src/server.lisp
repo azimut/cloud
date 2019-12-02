@@ -44,6 +44,6 @@
   (when *c*
     (csound::csoundcreatethread (cffi:get-callback 'newthread) *c*)))
 
-(defun stop-thread ()
-  ;;(bt:destroy-thread *thread*)
-  )
+(defun stop-csound ()
+  (csound:csoundstop *c*)
+  (csound:csounddestroy *c*))
