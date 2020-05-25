@@ -1,14 +1,5 @@
 (in-package #:cloud)
 
-(defmacro at (time function &rest arguments)
-  `(scheduler:sched-add *scheduler*
-                        (+ ,time (scheduler:sched-time *scheduler*))
-                        ,function ,@arguments))
-
-(declaim (inline now))
-(defun now ()
-  (scheduler:sched-time *scheduler*))
-
 (defun midihz (midi)
   (* (expt 2 (/ (- midi 69) 12)) 440f0))
 
@@ -28,7 +19,7 @@
 
 (defun csound-read-score (s)
   (declare (string s))
-  (csound:csoundreadscore *c* s))
+  (csound:read-score *c* s))
 
 (defun csound-send-event (iname duration delay vars)
   (declare (type string iname)
@@ -241,7 +232,6 @@
                 (loop
                   :for midi :in (cdr midis)
                   :for i :from offset :by offset
-                  :with now = (now)
                   :initially (playcsound-midi
                               ,i duration 0 (car midis)
                               ,@(loop :for (k v) :on rest :by #'cddr :append

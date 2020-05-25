@@ -15,6 +15,7 @@
    (server)))
 
 (defvar *c* nil)
+
 (defvar *csound-globals*
   ";; Initialize the global variables.
    sr = 44100
@@ -31,7 +32,7 @@
 (defvar *tmporc* NIL)
 (defvar *tmppartialorc* NIL)
 (defvar *thread* NIL)
-(defvar *scheduler* (make-instance 'scheduler:scheduler))
+
 
 (defun stich (&rest rest)
   "takes either several arguments or a list, puts them together
@@ -40,7 +41,7 @@
           (alexandria:flatten (remove-if #'null rest))))
 
 (defun resolve-csound-path (key-name &optional (extension ".orc")
-                                       (filepath *default-csound-path*))
+                                               (filepath *default-csound-path*))
   "returns the path"
   (let* ((name (symbol-name key-name))
          (file (merge-pathnames

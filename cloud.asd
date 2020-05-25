@@ -11,7 +11,6 @@
                #:cl-arrows
                #:cl-ppcre
                #:csound
-               #:scheduler
                #:serapeum
                #:str)
   :components ((:file "package")
@@ -22,3 +21,29 @@
                (:file "queries")
                (:file "player")
                (:file "default-instruments")))
+
+(asdf:defsystem #:cloud/scheduler
+  :description "Describe cloud here"
+  :author "azimut <azimut.github@protonmail.com>"
+  :license  "MIT"
+  :version "0.0.1"
+  :serial t
+  :pathname "src"
+  :depends-on (#:cloud
+               #:scheduler)
+  :components ((:file "scheduler")))
+
+(asdf:defsystem #:cloud/engine
+  :description "Describe cloud here"
+  :author "azimut <azimut.github@protonmail.com>"
+  :license  "MIT"
+  :version "0.0.1"
+  :serial t
+  :pathname "src/engine"
+  :depends-on (#:cloud
+               #:rtg-math)
+  :components ((:file "package")
+               (:file "main")
+               (:file "music")
+               (:file "roomless")
+               (:file "roomie")))
