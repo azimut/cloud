@@ -33,6 +33,17 @@
                #:scheduler)
   :components ((:file "scheduler")))
 
+(asdf:defsystem #:cloud/udp
+  :description "Describe cloud here"
+  :author "azimut <azimut.github@protonmail.com>"
+  :license  "MIT"
+  :version "0.0.1"
+  :serial t
+  :pathname "src"
+  :depends-on (#:cloud
+               #:usocket)
+  :components ((:file "csound-udp")))
+
 (asdf:defsystem #:cloud/engine
   :description "Describe cloud here"
   :author "azimut <azimut.github@protonmail.com>"
