@@ -42,7 +42,7 @@
   :pathname "src"
   :depends-on (#:cloud
                #:usocket)
-  :components ((:file "csound-udp")))
+  :components ((:file "udp")))
 
 (asdf:defsystem #:cloud/engine
   :description "Describe cloud here"
