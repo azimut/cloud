@@ -1,5 +1,22 @@
 (in-package #:cloud)
 
+;; TODO: complete class
+(defclass csound ()
+  ())
+
+(defclass internal (csound)
+  ((thread :reader thread)
+   (pointer :reader pointer)))
+
+(defmethod chnk ((server internal) (channel string))
+  (csound:compile-orc (pointer server) (format nil "chn_k ~s, 1" channel)))
+(defmethod chnset ((server internal) (channel string) (value double-float))
+  (csound:set-control-channel (pointer server) channel value))
+
+(defmethod disconnect ((server internal))
+  (csound:stop (pointer server))
+  (csound:destroy (pointer server)))
+
 (defun set-csound-options (&optional (options *csound-options*))
   "sends list of options to csound server, only happens once before started"
   (declare (type list options))

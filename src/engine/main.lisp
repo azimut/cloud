@@ -100,12 +100,10 @@
 
 (defun channel-string (name n)
   (format nil "~a~d" n name))
-(defun setup-channel (name n)
-  (declare (type string name) (type (integer 0) n))
-  (csound:compile-orc *c* (format nil "chn_k ~s, 1" (channel-string name n))))
+(defun init-channel (name n)
+  (chnk *server* (channel-string name n)))
 (defun set-channel (name n value)
-  (declare (type string name) (type (integer 0) n) (type double-float value))
-  (csound:set-control-channel *c* (channel-string name n) value))
+  (chnset *server* (channel-string name n) value))
 
 (defun get-listener-pos () (v! 0 0 0))
 (defun get-listener-rot () (q! 0f0 0f0 0f0 0f0))

@@ -9,6 +9,6 @@
    #:sco
    #:orc
    ;;
-   #:make-csound #:csound
+   #:udp
    #:connect #:disconnect #:reconnect
    #:send #:chnset #:schedule #:readscore))
