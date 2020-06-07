@@ -1,7 +1,6 @@
 (in-package #:cloud)
 
-;; diskin2 > hrtfmove2 = outs
-;; diskin2 > hrtfmove2 = outs
+;; TODO: free instrument?
 
 (defvar *roomless-instr*
   "instr ~d
@@ -11,11 +10,11 @@
      asig          diskin2   ~s, p4, p5, p6, 0, 32
      aleft, aright hrtfmove2 (asig * kAmp), kAz, kElev, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\"
                    outs      aleft * p7, aright * p7
-   endin")
+   endin"
+  "diskin2 > hrtfmove2 = out")
 
 (defclass roomless (audio)
   ((pos      :initarg :pos
-             :initform (v! 0 0 0)
              :accessor pos
              :documentation "audio position")
    (azimut   :initarg :azimut
@@ -27,19 +26,22 @@
    (amplitud :initarg :amplitud
              :accessor amplitud
              :documentation "value to be used for hrtfmove2"))
-  (:documentation "sound effect, position based hrtfmove2.
-                   diskin2 > hrtfmove2 = out"))
+  (:default-initargs
+   :pos (v! 0 0 0))
+  (:documentation "sound effect, position based hrtfmove2"))
+
+(defun format-roomless (n filename)
+  (format nil *roomless-instr* n n n n filename))
 
 (defmethod initialize-instance :before ((obj roomless) &key pos)
   (check-type pos rtg-math.types:vec3))
 
 (defmethod initialize-instance :after ((obj roomless) &key filename)
-  (let* ((n (ninstr obj))
-         (i (format nil *roomless-instr* n n filename)))
-    (setf (slot-value obj 'instr)  i)
-    (setup-channel "azimut"    i)
-    (setup-channel "altitude"  i)
-    (setup-channel "amplitude" i)))
+  (let* ((i (ninstr obj)))
+    (setf (slot-value obj 'instr) (format-roomless i filename))
+    (init-channel "azimut"    i)
+    (init-channel "altitude"  i)
+    (init-channel "amplitude" i)))
 
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
@@ -56,11 +58,11 @@
   (float
    (* (atan (- (y source-pos) (y listener-pos))
             (- (z source-pos) (z listener-pos)))
-      #.(/ 180f0 +PI+))
-   (atan (* 2f0 (+ (* (x listener-qrot) (y listener-qrot))
-                   (* (z listener-qrot) (w listener-qrot))))
-         (- 1f0 (* 2f0 (+ (expt (y listener-qrot) 2)
-                          (expt (z listener-qrot) 2)))))
+      #.(/ 180f0 +PI+)
+      (atan (* 2f0 (+ (* (x listener-qrot) (y listener-qrot))
+                      (* (z listener-qrot) (w listener-qrot))))
+            (- 1f0 (* 2f0 (+ (expt (y listener-qrot) 2)
+                             (expt (z listener-qrot) 2))))))
    0d0))
 (defun compute-amplitude (source-pos listener-pos)
   (* .5d0 ; fudge factor

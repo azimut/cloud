@@ -2,7 +2,58 @@
 ;; hrtfearly > hrtfreverb
 ;; hrtfearly >
 ;; TODO: define listener globals
-;; TODO: define hrtfreverb infinite instrument?
+;; TODO: other room arguments for custom are missing
+;; TODO: amp?
+;; TODO: initial source listener position update?
+;; custom room needs:
+;; - listener rotation
+;; - room-dim enforce 2ms MIN in all axis
+;; hrtfreverb needs:
+;; - reverb ammount (channel), which applies to a "delay" opcode (instr 10)
+;; - an instr playing that "hrtfreverb" opcode
+;; - input global of audio
+;; - zero global audio
+
+(defparameter *roomie-listener*
+  "gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
+   instr 1001
+     ibcount active 1001
+     if (ibcount == 1) then
+       klisx, klisy, klisz, klisdir init 0
+       gklisxSmooth   port klisx,   .025
+       gklisySmooth   port klisy,   .025
+       gkliszSmooth   port klisz,   .025
+       gklisdirSmooth port klisdir, .025
+     else
+       turnoff
+     endif
+   endin"
+  "Instrument to constantly smooth listener params.")
+
+(defclass listener ()
+  ((server :initform *server*
+           :initarg  :server
+           :reader server)
+   (pos    :initform (v! 0 0 0)
+           :accessor pos)))
+
+(defmethod initialize-instance :before ((obj listener) &key)
+  (check-type (slot-value obj 'server) csound))
+
+(defmethod initialize-instance :after ((obj listener) &key)
+  (with-slots (server) obj
+    (chnk server "klisx")
+    (chnk server "klisy")
+    (chnk server "klisz")
+    (chnk server "klisdir")
+    (send server *roomie-listener*)
+    (schedule server 1001 0 -1)))
+
+(defmethod (setf pos) :after (new-pos (obj listener))
+  (chnset (server obj) "klisx" (x new-pos))
+  (chnset (server obj) "klisy" (y new-pos))
+  (chnset (server obj) "klisz" (z new-pos)))
+
 (defparameter *roomie-instr*
   "instr ~d
      kx, ky, kz, kamp init 0
@@ -19,26 +70,24 @@
            outs      aleft * p7, aright * p7
    endin")
 
-;; TODO: other room arguments for custom are missing
-;; TODO: amp?
 (defclass roomie (audio)
   ((pos       :initarg :pos
               :accessor pos
-              :initform #(0f0 0f0 0f0)
+              :initform (v! 0 0 0)
               :documentation "3d position")
    (room-type :initarg :room-type
               :reader   room-type
               :initform :custom
               :documentation "Default room type to use")
-   (room-dim  :initarg :room-dim
-              :reader   room-dim
-              :initform #(10f0 10f0 10f0)))
+   (room-size :initarg :room-size
+              :reader   room-size
+              :initform (v! 2 2 2)))
   (:documentation "room based sound effect"))
 
-(defmethod initialize-instance :before ((obj roomie) &key room-dim)
+(defmethod initialize-instance :before ((obj roomie) &key room-size)
   (assert (member (slot-value obj 'room-type) '(:small :medium :large :custom))
           () "Invalid ROOM-TYPE")
-  (assert (and room-dim (eq :custom (slot-value obj 'room-type)))
+  (assert (and room-size (eq :custom (slot-value obj 'room-type)))
           () "CUSTOM room but no ROOM-DIM provided"))
 
 (defmethod initialize-instance :after ((obj roomie) &key)
@@ -47,25 +96,18 @@
     (init-channel "srcy" n)
     (init-channel "srcz" n)))
 
-(defmethod pos ((obj roomie))
-  (let ((dim (room-dim obj))
-        (pos (slot-value obj 'pos)))
-    (vector (+ (aref pos 0) (/ (aref dim 0) 2f0))
-            (+ (aref pos 1) (/ (aref dim 1) 2f0))
-            (+ (aref pos 2) (/ (aref dim 2) 2f0)))))
-
 (defmethod (setf pos) :after (value (obj roomie))
   (let ((n (ninstr obj)))
-    (set-channel "srcx" n (aref value 0))
-    (set-channel "srcy" n (aref value 1))
-    (set-channel "srcz" n (aref value 2))))
+    (set-channel "srcx" n (x value))
+    (set-channel "srcy" n (y value))
+    (set-channel "srcz" n (z value))))
 
-(defmethod room-dim ((obj roomie))
+(defmethod room-size ((obj roomie))
   (ecase (slot-value obj 'room-type)
-    (:small  #( 3  4 3))
-    (:medium #(10 10 3))
-    (:large  #(20 25 7))
-    (:custom (slot-value obj 'room-dim))))
+    (:small  (v!  3  4 3))
+    (:medium (v! 10 10 3))
+    (:large  (v! 20 25 7))
+    (:custom (slot-value obj 'room-size))))
 
 (defmethod room-type ((obj roomie))
   (ecase (slot-value obj 'room-type)
@@ -75,19 +117,9 @@
     (:large  3)))
 
 
-;; lisPos = Osc.StringToOscMessage("/listenerPositions "
-;;                                 + (listener.position.x + (roomSizeInMeters[0]/2)).ToString() + " "
-;;                                 + (listener.position.z + (roomSizeInMeters[2]/2)).ToString() + " "
-;;                                 + (listener.position.y + (roomSizeInMeters[1]/2)).ToString() + " "
-;;                                 + (listener.rotation.eulerAngles[1].ToString()) );
-
-(defun init-room ()
-  ;; Setup listener
-  (init-channel "dstx" 999)
-  (init-channel "dsty" 999)
-  (init-channel "dstz" 999))
-
-(defmethod update-listener ((obj roomie) listener-pos)
-  (set-channel "dstx" 999 (x listener-pos))
-  (set-channel "dsty" 999 (y listener-pos))
-  (set-channel "dstz" 999 (z listener-pos)))
+(defmethod upload-listener (()))
+(defmethod upload-source ((source roomie) (listener listener))
+  (let ((spos (pos source))
+        (lpos (pos listener))
+        (size (room-size source)))
+    (v3:*s size .5)))

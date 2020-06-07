@@ -1,5 +1,7 @@
 (in-package #:cloud)
 
+(defvar *server*)
+
 ;; TODO: complete class
 (defclass csound ()
   ())

@@ -51,7 +51,7 @@
   :version "0.0.1"
   :serial t
   :pathname "src/engine"
-  :depends-on (#:cloud
+  :depends-on (#:cloud/udp
                #:rtg-math)
   :components ((:file "package")
                (:file "main")

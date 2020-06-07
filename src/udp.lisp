@@ -20,8 +20,6 @@
    :host "127.0.0.1"
    :port 10000))
 
-(defvar *server*)
-
 (defmethod connect ((server udp))
   (setf (socket server)
         (usocket:socket-connect (host server) (port server) :protocol :datagram)))
