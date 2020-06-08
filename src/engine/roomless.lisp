@@ -14,9 +14,9 @@
   "diskin2 > hrtfmove2 = out")
 
 (defclass roomless (audio)
-  ((pos       :initarg :pos
-              :accessor pos
-              :documentation "audio position"))
+  ((pos :initarg :pos
+        :accessor pos
+        :documentation "audio position"))
   (:default-initargs
    :pos (v! 0 0 0))
   (:documentation "sound effect, position based hrtfmove2"))
