@@ -81,15 +81,14 @@
 
 (defclass audio ()
   ((filename :initarg :filename
-             :initform (error ":filename must be specified")
              :reader   filename
              :documentation "location on disk")
-   (instr    :initarg :instr
-             :reader   instr
+   (instr    :reader   instr
              :documentation "csound instr string")
-   (ninstr   :initarg :ninstr
-             :reader   ninstr
+   (ninstr   :reader   ninstr
              :documentation "csound instrument number"))
+  (:default-initargs
+   :filename (error ":filename must be specified"))
   (:documentation "base audio class"))
 
 (defmethod initialize-instance :before ((obj audio) &key filename)
@@ -99,7 +98,7 @@
   (setf (slot-value obj 'ninstr) (next-instrument filename)))
 
 (defun channel-string (name n)
-  (format nil "~a~d" n name))
+  (format nil "~a~d" name n))
 (defun init-channel (name n)
   (chnk *server* (channel-string name n)))
 (defun set-channel (name n value)

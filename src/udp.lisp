@@ -43,10 +43,6 @@
   (let ((msg (format nil "chnset ~a,\"~a\"" value channel)))
     (send server msg)))
 
-(defmethod chnk ((server udp) (channel string))
-  (let ((msg (format nil "chn_k ~s, 1" channel)))
-    (send server msg)))
-
 (defun format-schedule (instrument rest)
   (etypecase instrument
     (number (str:substring 0 -1 (format nil "schedule ~d,~{~d,~}" instrument rest)))
