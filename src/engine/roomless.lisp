@@ -16,16 +16,7 @@
 (defclass roomless (audio)
   ((pos       :initarg :pos
               :accessor pos
-              :documentation "audio position")
-   (azimut    :initarg :azimut
-              :accessor azimut
-              :documentation "value to be used for hrtfmove2")
-   (altitude  :initarg :altitude
-              :accessor altitude
-              :documentation "value to be used for hrtfmove2")
-   (amplitude :initarg :amplitude
-              :accessor amplitude
-              :documentation "value to be used for hrtfmove2"))
+              :documentation "audio position"))
   (:default-initargs
    :pos (v! 0 0 0))
   (:documentation "sound effect, position based hrtfmove2"))
@@ -38,11 +29,11 @@
 
 (defmethod initialize-instance :after ((obj roomless) &key filename)
   (let* ((i (ninstr obj)))
-    (setf (slot-value obj 'instr) (format-roomless i filename))
     (send *server* (format nil "chn_k \"~a~d\", 2" "azimut"    i))
     (send *server* (format nil "chn_k \"~a~d\", 2" "altitude"  i))
     (send *server* (format nil "chn_k \"~a~d\", 2" "amplitude" i))
-    (send *server* (instr obj))))
+    (send *server* (setf (slot-value obj 'instr)
+                         (format-roomless i filename)))))
 
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
@@ -68,31 +59,11 @@
                   (expt (- (y source-pos) (y listener-pos)) 2)
                   (expt (- (z source-pos) (z listener-pos)) 2))))))
 
-(defmethod (setf azimut) :after (value (obj roomless))
-  (set-channel "azimut" (ninstr obj) value))
-(defmethod (setf altitude) :after (value (obj roomless))
-  (set-channel "altitude" (ninstr obj) value))
-(defmethod (setf amplitude) :after (value (obj roomless))
-  (set-channel "amplitude" (ninstr obj) value))
-
-#+nil
 (defmethod (setf pos) :after (new-pos (obj roomless))
-  (setf (azimut    obj) (compute-azimut    new-pos lpos lrot))
-  (setf (altitude  obj) (compute-altitude  new-pos lpos lrot))
-  (setf (amplitude obj) (compute-amplitude new-pos lpos)))
-
-(defgeneric update (obj)
-  (:documentation "channel updates for audio object"))
-
-(defmethod update ((obj roomless))
-  (let ((lpos (v! 0 0 0) ;;(get-listener-pos)
-              )
-        (lrot (get-listener-rot)
-              )
-        (spos (v! (+ -2 (random 4)) 0 0) ;;(pos obj)
-              ))
-    (setf (azimut    obj) (compute-azimut    spos lpos lrot))
-    (setf (altitude  obj) (compute-altitude  spos lpos lrot))
-    (setf (amplitude obj) (compute-amplitude spos lpos))))
+  (let ((lpos (get-listener-pos))
+        (lrot (get-listener-rot)))
+    (set-channel "azimut"    (ninstr obj) (compute-azimut    new-pos lpos lrot))
+    (set-channel "altitude"  (ninstr obj) (compute-altitude  new-pos lpos lrot))
+    (set-channel "amplitude" (ninstr obj) (compute-amplitude new-pos lpos))))
 
 
