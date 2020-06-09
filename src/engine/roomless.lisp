@@ -29,10 +29,10 @@
 
 (defmethod initialize-instance :after ((obj roomless) &key filename)
   (let* ((i (ninstr obj)))
+    (setf (instr obj) (format-roomless i filename))
     (send *server* (format nil "chn_k \"~a~d\", 2" "azimut"    i))
     (send *server* (format nil "chn_k \"~a~d\", 2" "altitude"  i))
-    (send *server* (format nil "chn_k \"~a~d\", 2" "amplitude" i))
-    (setf (instr obj) (format-roomless i filename))))
+    (send *server* (format nil "chn_k \"~a~d\", 2" "amplitude" i))))
 
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
