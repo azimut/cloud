@@ -101,8 +101,9 @@
 
 (defun channel-string (name n)
   (format nil "~a~d" name n))
-(defun init-channel (name n)
-  (chnk *server* (channel-string name n)))
+(defun init-channel (name default-value)
+  (send *server* (format nil "chn_k ~s, 2" name))
+  (send *server* (format nil "chnset ~a, ~s" default-value name)))
 (defun set-channel (name n value)
   (chnset *server* (channel-string name n) value))
 

@@ -57,4 +57,5 @@
                (:file "main")
                (:file "music")
                (:file "roomless")
+               (:file "roomie-room")
                (:file "roomie")))

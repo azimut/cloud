@@ -7,56 +7,22 @@
 ;; TODO: initial source listener position update?
 ;; custom room needs:
 ;; - listener rotation
-;; - room-dim enforce 2ms MIN in all axis
+;; x room-dim enforce 2ms MIN in all axis
 ;; hrtfreverb needs:
-;; - reverb ammount (channel), which applies to a "delay" opcode (instr 10)
-;; - an instr playing that "hrtfreverb" opcode
-;; - input global of audio
-;; - zero global audio
-
-(defparameter *roomie-listener*
-  "gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
-   instr 1001
-     ibcount active 1001
-     if (ibcount == 1) then
-       klisx, klisy, klisz, klisdir init 0
-       gklisxSmooth   port klisx,   .025
-       gklisySmooth   port klisy,   .025
-       gkliszSmooth   port klisz,   .025
-       gklisdirSmooth port klisdir, .025
-     else
-       turnoff
-     endif
-   endin"
-  "Instrument to constantly smooth listener params.")
-
-(defclass listener ()
-  ((server :initform *server*
-           :initarg  :server
-           :reader server)
-   (pos    :initform (v! 0 0 0)
-           :accessor pos)))
-
-(defmethod initialize-instance :before ((obj listener) &key)
-  (check-type (slot-value obj 'server) csound))
-
-(defmethod initialize-instance :after ((obj listener) &key)
-  (with-slots (server) obj
-    (chnk server "klisx")
-    (chnk server "klisy")
-    (chnk server "klisz")
-    (chnk server "klisdir")
-    (send server *roomie-listener*)
-    (schedule server 1001 0 -1)))
-
-(defmethod (setf pos) :after (new-pos (obj listener))
-  (chnset (server obj) "klisx" (x new-pos))
-  (chnset (server obj) "klisy" (y new-pos))
-  (chnset (server obj) "klisz" (z new-pos)))
+;; x reverb ammount (channel), which applies to a "delay" opcode (instr 10)
+;; x an instr playing that "hrtfreverb" opcode
+;; x input global of audio
+;; x zero global audio
 
 (defparameter *roomie-instr*
-  "instr ~d
-     kx, ky, kz, kamp init 0
+  "gamain init 0
+   gimfp init 0
+   gilowrt60, gihighrt60 init 0
+   instr ~d
+     klx, kly, klz, kx, ky, kz, kamp init 0
+     klx   chnget  \"lisx\"
+     kly   chnget  \"lisy\"
+     klz   chnget  \"lisz\"
      kx    chnget  \"srcx~d\"
      ky    chnget  \"srcy~d\"
      kz    chnget  \"srcz~d\"
@@ -65,36 +31,30 @@
      kSrcy port    ky, .025
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
-
-     aleft, aright, irt60low, irt60high, imfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
+     gamain = asig + gamain
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, klx, kly, klz, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
            outs      aleft * p7, aright * p7
    endin")
-
-(defclass roomie (audio)
-  ((pos       :initarg :pos
-              :accessor pos
-              :initform (v! 0 0 0)
-              :documentation "3d position")
-   (room-type :initarg :room-type
-              :reader   room-type
-              :initform :custom
-              :documentation "Default room type to use")
-   (room-size :initarg :room-size
-              :reader   room-size
-              :initform (v! 2 2 2)))
+;;     aleft, aright, irt60low, irt60high, imfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
+(defclass roomie (audio roomie-room)
+  ((pos :initarg :pos
+        :accessor pos
+        :initform (v! 0 0 0)
+        :documentation "3d position"))
   (:documentation "room based sound effect"))
 
-(defmethod initialize-instance :before ((obj roomie) &key room-size)
-  (assert (member (slot-value obj 'room-type) '(:small :medium :large :custom))
-          () "Invalid ROOM-TYPE")
-  (assert (and room-size (eq :custom (slot-value obj 'room-type)))
-          () "CUSTOM room but no ROOM-DIM provided"))
+(defun make-roomie (filename)
+  (make-instance 'roomie :filename filename :room-type :small))
 
-(defmethod initialize-instance :after ((obj roomie) &key)
+(defun format-roomie (n filename room-type)
+  (format nil *roomie-instr* n n n n n filename room-type))
+
+(defmethod initialize-instance :after ((obj roomie) &key filename)
   (let ((n (ninstr obj)))
-    (init-channel "srcx" n)
-    (init-channel "srcy" n)
-    (init-channel "srcz" n)))
+    (setf (instr obj) (format-roomie n filename (room-type obj)))
+    (send *server* (format nil "chn_k \"~a~d\", 2" "srcx" n))
+    (send *server* (format nil "chn_k \"~a~d\", 2" "srcy" n))
+    (send *server* (format nil "chn_k \"~a~d\", 2" "srcz" n))))
 
 (defmethod (setf pos) :after (value (obj roomie))
   (let ((n (ninstr obj)))
@@ -102,24 +62,24 @@
     (set-channel "srcy" n (y value))
     (set-channel "srcz" n (z value))))
 
-(defmethod room-size ((obj roomie))
-  (ecase (slot-value obj 'room-type)
-    (:small  (v!  3  4 3))
-    (:medium (v! 10 10 3))
-    (:large  (v! 20 25 7))
-    (:custom (slot-value obj 'room-size))))
+(defun upload-listener ()
+  (let ((new-pos (get-listener-pos)))
+    (chnset *server* "lposx" (x new-pos))
+    (chnset *server* "lposy" (y new-pos))
+    (chnset *server* "lposz" (z new-pos))))
 
-(defmethod room-type ((obj roomie))
-  (ecase (slot-value obj 'room-type)
-    (:custom 0)
-    (:medium 1)
-    (:small  2)
-    (:large  3)))
-
-
-(defmethod upload-listener (()))
-(defmethod upload-source ((source roomie) (listener listener))
-  (let ((spos (pos source))
-        (lpos (pos listener))
-        (size (room-size source)))
-    (v3:*s size .5)))
+(defun upload-source (source)
+  (let ((spos  (v! 1
+                   0
+                   .5) ;;(pos source)
+               )
+        (lpos  (v! 0 0 0) ;;(get-listener-pos)
+               )
+        (hsize (v3:*s (room-size source) 0.5)))
+    (chnset *server* "lposx" (print (- (x lpos) (x hsize))))
+    (chnset *server* "lposy" (print (- (y lpos) (y hsize))))
+    (chnset *server* "lposz" (print (- (z lpos) (z hsize))))
+    ;;
+    (set-channel "srcpos" (ninstr source) (print (- (x spos) (x hsize))))
+    (set-channel "srcpos" (ninstr source) (print (- (y spos) (y hsize))))
+    (set-channel "srcpos" (ninstr source) (print (- (z spos) (z hsize))))))
