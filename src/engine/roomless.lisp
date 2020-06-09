@@ -32,8 +32,7 @@
     (send *server* (format nil "chn_k \"~a~d\", 2" "azimut"    i))
     (send *server* (format nil "chn_k \"~a~d\", 2" "altitude"  i))
     (send *server* (format nil "chn_k \"~a~d\", 2" "amplitude" i))
-    (send *server* (setf (slot-value obj 'instr)
-                         (format-roomless i filename)))))
+    (setf (instr obj) (format-roomless i filename))))
 
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
@@ -65,5 +64,3 @@
     (set-channel "azimut"    (ninstr obj) (compute-azimut    new-pos lpos lrot))
     (set-channel "altitude"  (ninstr obj) (compute-altitude  new-pos lpos lrot))
     (set-channel "amplitude" (ninstr obj) (compute-amplitude new-pos lpos))))
-
-

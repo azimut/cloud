@@ -83,7 +83,7 @@
   ((filename :initarg :filename
              :reader   filename
              :documentation "location on disk")
-   (instr    :reader   instr
+   (instr    :accessor instr
              :documentation "csound instr string")
    (ninstr   :reader   ninstr
              :documentation "csound instrument number"))
@@ -93,9 +93,11 @@
 
 (defmethod initialize-instance :before ((obj audio) &key filename)
   (assert (probe-file filename)))
-
 (defmethod initialize-instance :after ((obj audio) &key filename)
   (setf (slot-value obj 'ninstr) (next-instrument filename)))
+
+(defmethod (setf instr) :after (new-value (obj audio))
+  (send *server* new-value))
 
 (defun channel-string (name n)
   (format nil "~a~d" name n))
