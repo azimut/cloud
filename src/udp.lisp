@@ -22,7 +22,8 @@
 
 (defmethod connect ((server udp))
   (setf (socket server)
-        (usocket:socket-connect (host server) (port server) :protocol :datagram)))
+        (usocket:socket-connect (host server) (port server) :protocol :datagram))
+  t)
 
 (defmethod disconnect ((server udp))
   (when (socket server)
