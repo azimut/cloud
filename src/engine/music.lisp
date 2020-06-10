@@ -20,7 +20,7 @@
   (let* ((n (ninstr obj))
          (i (format nil *music-instr* n n filename)))
     (setf (slot-value obj 'instr)  i)
-    (csound:compile-orc *c* i)))
+    (send *server* i)))
 
 (defun make-music (filename)
   (make-instance 'music :filename filename))
