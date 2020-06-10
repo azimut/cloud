@@ -1,24 +1,9 @@
 (in-package #:cloud)
 
-
 ;; hrtfearly > hrtfreverb
 ;; hrtfearly >
 ;; TODO: define listener globals
-;; TODO: other room arguments for custom are missing
 ;; TODO: amp?
-;; TODO: initial source listener position update?
-;; gamain     - gathers diskin2 audio
-;; gimfp      - return value of hrtfearly, 5th and last
-;; gilowrt60  - "
-;; gihighrt60 - "
-;; custom room needs:
-;; x listener rotation
-;; x room-dim enforce 2ms MIN in all axis
-;; hrtfreverb needs:
-;; x reverb ammount (channel), which applies to a "delay" opcode (instr 10)
-;; x an instr playing that "hrtfreverb" opcode
-;; x input global of audio
-;; x zero global audio
 
 (defparameter *roomie-instr*
   "gamain init 0
