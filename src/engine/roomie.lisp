@@ -1,5 +1,5 @@
 (in-package #:cloud)
-;; About the "kheadrot" param of hrtfearly. I found that in the code for http://csoundjournal.com/issue19/InterfacingCsoundUnity.html is the Yaw/Y-rotation in euler angles but I don't see it mentioned on the documentation.
+
 
 ;; hrtfearly > hrtfreverb
 ;; hrtfearly >
@@ -12,7 +12,7 @@
 ;; gilowrt60  - "
 ;; gihighrt60 - "
 ;; custom room needs:
-;; - listener rotation
+;; x listener rotation
 ;; x room-dim enforce 2ms MIN in all axis
 ;; hrtfreverb needs:
 ;; x reverb ammount (channel), which applies to a "delay" opcode (instr 10)
@@ -102,20 +102,18 @@
     (init-channel (format nil "srcy~d" n) 0)
     (init-channel (format nil "srcz~d" n) 0)))
 
-(defmethod (setf pos) :after (value (obj roomie))
-  (let ((n (ninstr obj)))
-    (set-channel "srcx" n (x value))
-    (set-channel "srcy" n (y value))
-    (set-channel "srcz" n (z value))))
+(defmethod (setf pos) :before (new-value (obj roomie))
+  (when (not (v3:= new-value (slot-value obj 'pos)))
+    (let ((hsize (v3:*s (room-size obj) .5))
+          (n (ninstr obj)))
+      (set-channel "srcx" n (+ (x new-value) (x hsize)))
+      (set-channel "srcy" n (+ (y new-value) (y hsize)))
+      (set-channel "srcz" n (+ (z new-value) (z hsize))))))
 
 (defun upload-source (source)
-  (let ((spos (pos source))
-        (lpos (get-listener-pos))
+  (let ((lpos  (get-listener-pos))
         (hsize (v3:*s (room-size source) 0.5)))
-    (chnset *server* "lisx" (- (x lpos) (x hsize)))
-    (chnset *server* "lisy" (- (y lpos) (y hsize)))
-    (chnset *server* "lisz" (- (z lpos) (z hsize)))
-    (chnset *server* "lisrot" (rot-y (get-listener-rot)))
-    (set-channel "srcpos" (ninstr source) (- (x spos) (x hsize)))
-    (set-channel "srcpos" (ninstr source) (- (y spos) (y hsize)))
-    (set-channel "srcpos" (ninstr source) (- (z spos) (z hsize)))))
+    (chnset *server* "lisx"   (+ (x lpos) (x hsize)))
+    (chnset *server* "lisy"   (+ (y lpos) (y hsize)))
+    (chnset *server* "lisz"   (+ (z lpos) (z hsize)))
+    (chnset *server* "lisrot" (rot-y (get-listener-rot)))))
