@@ -40,10 +40,11 @@
      aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
            outs      aleft * p7, aright * p7
    endin")
-
+;;  gklisxSmooth, gklisySmooth, gkliszSmooth
+;; gklisdirSmooth,
 (defclass roomie (audio roomie-room listener)
   ((pos :initarg :pos
-        :Accessor pos
+        :accessor pos
         :initform (v! 0 0 0)
         :documentation "3d position"))
   (:documentation "room based sound effect"))
@@ -58,8 +59,8 @@
             (:custom (format nil *roomie-instr-custom* n n n n n filename
                              (slot-value obj 'order)
                              (x room-size)
-                             (y room-size)
                              (z room-size)
+                             (y room-size)
                              (slot-value obj 'wall-high)
                              (slot-value obj 'wall-low)
                              (slot-value obj 'wall-gain1)
@@ -81,17 +82,21 @@
     (init-channel (format nil "srcz~d" n) 0f0)))
 
 (defmethod (setf pos) :before (new-value (obj roomie))
-  (when (not (v3:= new-value (slot-value obj 'pos)))
-    (let ((hsize (v3:*s (room-size obj) .5))
-          (n (ninstr obj)))
-      (set-channel (format nil "srcx~d" n) (+ (x new-value) (x hsize)))
-      (set-channel (format nil "srcy~d" n) (+ (y new-value) (y hsize)))
-      (set-channel (format nil "srcz~d" n) (+ (z new-value) (z hsize))))))
+  (when (not (v3:= new-value (slot-value obj 'pos))))
+  (let ((hsize ;;(v3! 0)
+          (v3:*s (room-size obj) .5)
+          )
+        (n (ninstr obj)))
+    (set-channel (format nil "srcx~d" n) (+ (x new-value) (x hsize)))
+    (set-channel (format nil "srcy~d" n) (+ (z new-value) (z hsize)))
+    (set-channel (format nil "srcz~d" n) (+ (y new-value) (y hsize)))))
 
 (defun upload-source (source)
   (let ((lpos  (get-listener-pos))
-        (hsize (v3:*s (room-size source) 0.5)))
-    (set-channel "lisx"   (+ (x lpos) (x hsize)))
-    (set-channel "lisy"   (+ (y lpos) (y hsize)))
-    (set-channel "lisz"   (+ (z lpos) (z hsize)))
-    (set-channel "lisrot" (+ 180f0 (degrees (realpart (rot-y (get-listener-rot))))))))
+        (hsize ;;(v3! 0)
+          (v3:*s (room-size source) 0.5)
+          ))
+    (set-channel "lisx" (+ (x lpos) (x hsize)))
+    (set-channel "lisy" (+ (z lpos) (z hsize)))
+    (set-channel "lisz"  (+ (y lpos) (y hsize)))
+    (set-channel "lisdir" (degrees (realpart (rot-y (get-listener-rot)))))))

@@ -6,10 +6,10 @@
      ibcount active 1001
      if (ibcount == 1) then
        klisx, klisy, klisz, klisdir init 0
-       klisx          chnget \"lposx\"
-       klisy          chnget \"lposy\"
-       klisz          chnget \"lposz\"
-       klisdir        chnget \"ldir\"
+       klisx          chnget \"lisx\"
+       klisy          chnget \"lisy\"
+       klisz          chnget \"lisz\"
+       klisdir        chnget \"lisdir\"
        gklisxSmooth   port   klisx,   .025
        gklisySmooth   port   klisy,   .025
        gkliszSmooth   port   klisz,   .025
@@ -24,9 +24,9 @@
   ())
 
 (defmethod initialize-instance :after ((obj listener) &key)
-  (init-channel "lposx" 0.0)
-  (init-channel "lposy" 0.0)
-  (init-channel "lposz" 0.0)
-  (init-channel "ldir"  0.0)
+  (init-channel "lisx" 0.0)
+  (init-channel "lisy" 0.0)
+  (init-channel "lisz" 0.0)
+  (init-channel "lisdir"  0.0)
   (send *server* *roomie-listener*)
   (schedule *server* 1001 0 -1))
