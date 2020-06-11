@@ -46,7 +46,7 @@
 
 (defun format-schedule (instrument rest)
   (etypecase instrument
-    (number (str:substring 0 -1 (format nil "schedule ~d,~{~d,~}" instrument rest)))
+    (number (str:substring 0 -1 (format nil "&i~d ~{~d ~}" instrument rest)))
     (string (str:substring 0 -1 (format nil "schedule ~s,~{~d,~}" instrument rest)))))
 
 (defmethod schedule ((server udp) instrument &rest rest)
