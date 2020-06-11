@@ -41,7 +41,7 @@
     (send server msg)))
 
 (defmethod chnset ((server udp) (channel string) (value number))
-  (let ((msg (format nil "chnset ~a,\"~a\"" value channel)))
+  (let ((msg (format nil "@~a ~d" channel value)))
     (send server msg)))
 
 (defun format-schedule (instrument rest)

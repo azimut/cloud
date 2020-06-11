@@ -101,11 +101,11 @@
 
 (defun channel-string (name n)
   (format nil "~a~d" name n))
+(defun set-channel (name value)
+  (chnset *server* name value))
 (defun init-channel (name default-value)
   (send *server* (format nil "chn_k ~s, 2" name))
-  (send *server* (format nil "chnset ~a, ~s" default-value name)))
-(defun set-channel (name n value)
-  (chnset *server* (channel-string name n) value))
+  (set-channel name default-value))
 
 (defun get-listener-pos () (v! 0 0 0))
 (defun get-listener-rot () (q! 0f0 0f0 0f0 0f0))
