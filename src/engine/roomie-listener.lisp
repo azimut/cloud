@@ -18,28 +18,15 @@
        turnoff
      endif
    endin"
-  "Instrument to constantly smooth listener params.")
+  "Instrument to constantly smooth listener params. Audio glitches otherwise.")
 
 (defclass listener ()
-  ((server :initform *server*
-           :initarg  :server
-           :reader server)
-   (pos    :initform (v! 0 0 0)
-           :accessor pos)))
-
-(defmethod initialize-instance :before ((obj listener) &key)
-  (check-type (slot-value obj 'server) csound))
+  ())
 
 (defmethod initialize-instance :after ((obj listener) &key)
-  (with-slots (server) obj
-    (chnk server "lposx")
-    (chnk server "lposy")
-    (chnk server "lposz")
-    (chnk server "ldir")
-    (send server *roomie-listener*)
-    (schedule server 1001 0 -1)))
-
-(defmethod (setf pos) :after (new-pos (obj listener))
-  (chnset (server obj) "lposx" (x new-pos))
-  (chnset (server obj) "lposy" (y new-pos))
-  (chnset (server obj) "lposz" (z new-pos)))
+  (init-channel "lposx" 0.0)
+  (init-channel "lposy" 0.0)
+  (init-channel "lposz" 0.0)
+  (init-channel "ldir"  0.0)
+  (send *server* *roomie-listener*)
+  (schedule *server* 1001 0 -1))

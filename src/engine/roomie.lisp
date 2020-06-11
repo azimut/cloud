@@ -9,10 +9,7 @@
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    instr ~d
-     klx, kly, klz, kx, ky, kz, kamp init 0
-     klx   chnget  \"lisx\"
-     kly   chnget  \"lisy\"
-     klz   chnget  \"lisz\"
+     kx, ky, kz, kamp init 0
      kx    chnget  \"srcx~d\"
      ky    chnget  \"srcy~d\"
      kz    chnget  \"srcz~d\"
@@ -22,7 +19,7 @@
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
      gamain = asig + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, klx, kly, klz, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
            outs      aleft * p7, aright * p7
    endin")
 
@@ -30,11 +27,7 @@
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    instr ~d
-     klx, kly, klz, klrot, kx, ky, kz, kamp init 0
-     klx   chnget  \"lisx\"
-     kly   chnget  \"lisy\"
-     klz   chnget  \"lisz\"
-     klrot chnget  \"lisrot\"
+     kx, ky, kz, kamp init 0
      kx    chnget  \"srcx~d\"
      ky    chnget  \"srcy~d\"
      kz    chnget  \"srcz~d\"
@@ -44,11 +37,11 @@
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
      gamain = asig + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, klx, kly, klz, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, klrot, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
            outs      aleft * p7, aright * p7
    endin")
-;;     aleft, aright, irt60low, irt60high, imfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
-(defclass roomie (audio roomie-room)
+
+(defclass roomie (audio roomie-room listener)
   ((pos :initarg :pos
         :Accessor pos
         :initform (v! 0 0 0)
@@ -101,4 +94,4 @@
     (set-channel "lisx"   (+ (x lpos) (x hsize)))
     (set-channel "lisy"   (+ (y lpos) (y hsize)))
     (set-channel "lisz"   (+ (z lpos) (z hsize)))
-    (set-channel "lisrot" (rot-y (get-listener-rot)))))
+    (set-channel "lisrot" (+ 180f0 (degrees (realpart (rot-y (get-listener-rot))))))))

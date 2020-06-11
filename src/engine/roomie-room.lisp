@@ -86,10 +86,6 @@
                                           (max (y room-size) 2)
                                           (max (z room-size) 2))))
   (init-channel "reverb" (slot-value obj 'reverb))
-  (init-channel "lisx"   0.0)
-  (init-channel "lisy"   0.0)
-  (init-channel "lisz"   0.0)
-  (init-channel "lisrot" 0.0)
   (send *server* (format-roomie-room (order obj)))
   (schedule *server* 1010 0 -1))
 
