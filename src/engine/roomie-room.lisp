@@ -69,7 +69,7 @@
   (format nil *roomie-room* order))
 
 (defmethod (setf reverb) :after (new-value (obj roomie-room))
-  (chnset *server* "reverb" new-value))
+  (set-channel "reverb" new-value))
 
 (defmethod initialize-instance :before ((obj roomie-room) &key room-type room-size order)
   (assert (member room-type '(:small :medium :large :custom))
