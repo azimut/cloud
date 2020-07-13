@@ -1,76 +1,11 @@
 (in-package #:cloud)
 
-
-;; https://www.fmod.com/resources/documentation-studio?version=2.0&page=parameters.html
-;; - params: linear, discrete(01), labeled (from FMOD)
-
-;; - multiple continuos audio (-sdlmix)
-;; - delay (useful for layered effects of 1+ sounds)
-
-;; + 3d audio
-;; -- distance
-;; -- direction
-;; -- elevation
-;; -- event orientation
-;; -- event cone angle
-
-;; - volume shifting (steps)
-;; - pitch shifting (useful to make more sounds of a few, steps)
-;; - reverb
-;; ? oclussion
-
-;; Useful helpers:
-;; - Get sample 2 on channel 1
-;; (csound::csoundgetspoutsample *c* 2 1)
-;; - Get pointer of audio output working buffer (layout???
-;; (csound::csoundgetspoutsample *c*)
-;; csoundGetChannelPtr
-;; - Can be used to send a new or a redinition of an existing one
-;; (csound:compile-orc *c* "instr N ....")
-;; - Put sfx in tables (f1, f2)
-;; - Put songs in instruments with diskin
-;; (make-play fox "i4" :rate 1 :skip 0 :loop 0 :amp 1)
-;; (make-play pfox "i10")
-;; (csound:compile-orc *c* "
-;;   gasrc init 0
-;;   instr 4
-;;     ibcount active 4
-;;     if (ibcount == 1) then
-;;       ktrans linseg  1, 5, 2, 10, -2
-;;       a1     diskin2 \"fox.wav\", p4, p5, p6, 0, 32
-;;       gasrc = a1 * p7
-;;     else
-;;       turnoff
-;;     endif
-;;   endin
-;;   instr 10
-;;     iacount active 10
-;;     if (iacount == 1) then
-;;       kaz          linseg    0, p3, 720
-;;       aleft,aright hrtfmove2 gasrc, kaz, 0, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\"
-;;                    outs aleft, aright
-;;       clear gasrc
-;;     else
-;;       turnoff
-;;     endif
-;;   endin")
-;; (progn (play-fox  3 :rate .8 :skip .8)
-;;        (play-pfox 3))
-
-;; env SSDIR
-;; ar1[] diskin2
-;; ifilcod[,       "file.wav"
-;; kpitch[,        0.9           rate
-;; iskiptim[,      0             skip seconds of audio (doesn't skip on loop)
-;; iwrap[,         1             loop or not
-;; iformat[,       0             raw fileformat...do not use
-;; iwsize[,        0             interpolation of pitch
-;; ibufsize[,      0             ?
-;; iskipinit]]]]]]]
-
 (defvar *file-to-instrument* (make-hash-table :test #'equal))
 (defvar *instruments* 0)
 ;; TODO: restart?
+(defun ninstr-p (filename)
+  (and (gethash filename *file-to-instrument*)
+       t))
 (defun next-instrument (filename)
   (setf (gethash filename *file-to-instrument*)
         (or (gethash filename *file-to-instrument*)
