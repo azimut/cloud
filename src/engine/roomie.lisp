@@ -2,7 +2,6 @@
 
 ;; hrtfearly > hrtfreverb
 ;; hrtfearly >
-;; TODO: define listener globals
 ;; TODO: amp?
 
 (defparameter *roomie-instr*
@@ -18,9 +17,9 @@
      kSrcy port    ky, .025
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
-     gamain = asig + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
-           outs      aleft * p7, aright * p7
+     gamain = asig * p7 + gamain
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
+           outs      aleft, aright
    endin")
 
 (defparameter *roomie-instr-custom*
@@ -36,12 +35,11 @@
      kSrcy port    ky, .025
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
-     gamain = asig + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
-           outs      aleft * p7, aright * p7
+     gamain = asig * p7 + gamain
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
+           outs      aleft, aright
    endin")
-;;  gklisxSmooth, gklisySmooth, gkliszSmooth
-;; gklisdirSmooth,
+
 (defclass roomie (audio roomie-room listener)
   ((pos :initarg :pos
         :accessor pos
@@ -83,9 +81,7 @@
 
 (defmethod (setf pos) :before (new-value (obj roomie))
   (when (not (v3:= new-value (slot-value obj 'pos))))
-  (let ((hsize ;;(v3! 0)
-          (v3:*s (room-size obj) .5)
-          )
+  (let ((hsize (v3:*s (room-size obj) .5))
         (n (ninstr obj)))
     (set-channel (format nil "srcx~d" n) (+ (x new-value) (x hsize)))
     (set-channel (format nil "srcy~d" n) (+ (z new-value) (z hsize)))
@@ -93,10 +89,8 @@
 
 (defun upload-source (source)
   (let ((lpos  (get-listener-pos))
-        (hsize ;;(v3! 0)
-          (v3:*s (room-size source) 0.5)
-          ))
-    (set-channel "lisx" (+ (x lpos) (x hsize)))
-    (set-channel "lisy" (+ (z lpos) (z hsize)))
-    (set-channel "lisz"  (+ (y lpos) (y hsize)))
+        (hsize (v3:*s (room-size source) 0.5)))
+    (set-channel "lisx"   (+ (x lpos) (x hsize)))
+    (set-channel "lisy"   (+ (z lpos) (z hsize)))
+    (set-channel "lisz"   (+ (y lpos) (y hsize)))
     (set-channel "lisdir" (degrees (realpart (rot-y (get-listener-rot)))))))
