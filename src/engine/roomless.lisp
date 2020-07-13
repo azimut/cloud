@@ -16,9 +16,8 @@
 (defclass roomless (audio)
   ((pos :initarg :pos
         :accessor pos
+        :initform (v! 0 0 0)
         :documentation "audio position"))
-  (:default-initargs
-   :pos (v! 0 0 0))
   (:documentation "sound effect, position based hrtfmove2"))
 
 (defun format-roomless (n filename)
