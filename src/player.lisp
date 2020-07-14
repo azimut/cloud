@@ -17,16 +17,11 @@
 
 ;;--------------------------------------------------
 
-(defun csound-read-score (s)
-  (declare (string s))
-  (csound:read-score *c* s))
-
 (defun csound-send-event (iname duration delay vars)
   (declare (type string iname)
            (type number duration delay)
            (type list   vars))
-  (csound-read-score
-   (format nil "~a ~s ~a ~{~A~^ ~}" iname delay duration vars)))
+  (readscore *server* (format nil "~a ~s ~a ~{~A~^ ~}" iname delay duration vars)))
 
 (defgeneric playcsound (instrument duration delay &rest rest))
 (defmethod playcsound ((iname string) (duration number) (delay number) &rest rest)

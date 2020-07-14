@@ -1,7 +1,7 @@
 (in-package #:cloud)
 
 (defclass internal (csound)
-  ((pointer :accessor pointer)
+  ((pointer :accessor pointer :initform nil); unbound?
    (options :accessor options)))
 
 (defmethod (setf options) :before (new-options (server internal))

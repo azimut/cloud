@@ -1,7 +1,5 @@
 (in-package #:cloud)
 
-(defvar *server*)
-
 (defvar *file-to-instrument* (make-hash-table :test #'equal))
 (defvar *instruments* 0)
 ;; TODO: restart?

@@ -13,11 +13,7 @@
             :documentation "score string, has the wavetables")
    (file    :initarg :file)))
 
-(defclass csound-server ()
-  ((thread)
-   (server)))
-
-(defvar *c* nil)
+(defvar *server* "KLUDGE: global server used for some things")
 
 (defvar *csound-globals*
   ";; Initialize the global variables.
@@ -34,8 +30,6 @@
 (defvar *default-csound-path* (asdf:system-relative-pathname :cloud "default-instruments/"))
 (defvar *tmporc* NIL)
 (defvar *tmppartialorc* NIL)
-(defvar *thread* NIL)
-
 
 (defun stich (&rest rest)
   "takes either several arguments or a list, puts them together
