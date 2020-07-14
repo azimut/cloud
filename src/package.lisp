@@ -1,7 +1,8 @@
 ;;;; package.lisp
 
-(defpackage #:cloud
+(uiop:define-package #:cloud
   (:use #:cl)
+  (:shadow #:load)
   (:export
    ;;
    #:list-orcs

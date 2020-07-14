@@ -36,6 +36,19 @@
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
 
+(defun rot-x (q)
+  "returns the EULER rotation in X from quaternion Q"
+  (declare (type rtg-math.types:quaternion q))
+  (atan (* 2f0 (+ (* (x q) (y q))
+                  (* (z q) (w q))))
+        (- 1f0 (* 2f0 (+ (expt (y q) 2)
+                         (expt (z q) 2))))))
+(defun rot-y (q)
+  "returns the EULER rotation in Y from quaternion Q"
+  (declare (type rtg-math.types:quaternion q))
+  (asin (* 2 (- (* (x q) (z q))
+                (* (w q) (y q))))))
+
 ;; https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 (defun compute-azimut (source-pos listener-pos listener-qrot)
   (- (* (atan (- (x source-pos) (x listener-pos))

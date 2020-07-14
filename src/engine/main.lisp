@@ -1,5 +1,7 @@
 (in-package #:cloud)
 
+(defvar *server*)
+
 (defvar *file-to-instrument* (make-hash-table :test #'equal))
 (defvar *instruments* 0)
 ;; TODO: restart?
@@ -44,21 +46,3 @@
 
 (defun get-listener-pos () (v! 0 0 0))
 (defun get-listener-rot () (q! 0f0 0f0 0f0 0f0))
-
-(defun rot-x (q)
-  "returns the EULER rotation in X from quaternion Q"
-  (declare (type rtg-math.types:quaternion q))
-  (atan (* 2f0 (+ (* (x q) (y q))
-                  (* (z q) (w q))))
-        (- 1f0 (* 2f0 (+ (expt (y q) 2)
-                         (expt (z q) 2))))))
-(defun rot-y (q)
-  "returns the EULER rotation in Y from quaternion Q"
-  (declare (type rtg-math.types:quaternion q))
-  (asin (* 2 (- (* (x q) (z q))
-                (* (w q) (y q))))))
-#+nil
-(progn
-  (print (m3:rotation-from-euler
-          (v! (rot-x (q:from-axis-angle (v! 1 0 0) 20f0)) 0 0)))
-  (print (m3:rotation-from-axis-angle (v! 1 0 0) 20f0)))

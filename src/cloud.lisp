@@ -1,5 +1,8 @@
 (in-package #:cloud)
 
+(defclass csound ()
+  ())
+
 (defclass orc ()
   ((name    :initarg :name)
    (globals :initarg :globals :reader globals
