@@ -17,7 +17,7 @@
                (:file "cloud")
                (:file "parser")
                (:file "merger")
-               (:file "server")
+               (:file "internal")
                (:file "queries")
                (:file "player")
                (:file "default-instruments")))
