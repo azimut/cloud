@@ -15,7 +15,7 @@
 
 (defvar *server* "KLUDGE: global server used for some things")
 
-(defvar *csound-globals*
+(defvar *csound-globals* ""
   ";; Initialize the global variables.
    sr = 44100
    kr = 4410
@@ -24,7 +24,7 @@
 
 ;; JACK?
 ;;(defvar *csound-options* '("-odac" "--nchnls=2" "-+rtaudio=jack" "-b128" "-B1048" "--sample-rate=44100"))
-(defvar *csound-options* '("-odac" "-m3" "--nchnls=2"))
+(defvar *csound-options* '("-n" "-odac" "-m3" "--nchnls=2"))
 
 (defvar *orcs* (make-hash-table))
 (defvar *default-csound-path* (asdf:system-relative-pathname :cloud "default-instruments/"))

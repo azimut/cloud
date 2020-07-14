@@ -27,7 +27,8 @@
   (:documentation "base audio class"))
 
 (defmethod initialize-instance :before ((obj audio) &key filename)
-  (assert (probe-file filename)))
+  (assert (probe-file filename))
+  (assert (str:ends-with-p "wav" filename)))
 (defmethod initialize-instance :after ((obj audio) &key filename)
   (setf (slot-value obj 'ninstr) (next-instrument filename)))
 

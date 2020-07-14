@@ -34,11 +34,15 @@
 
 (defmethod chnk ((server internal) (channel string))
   (csound:compile-orc (pointer server) (format nil "chn_k ~s, 1" channel)))
-(defmethod chnset ((server internal) (channel string) (value double-float))
-  (csound:set-control-channel (pointer server) channel value))
+(defmethod chnset ((server internal) (channel string) (value number))
+  (csound:set-control-channel (pointer server) channel (float value 1d0)))
 
 (defmethod readscore ((server internal) (score string))
   (csound:read-score (pointer server) score))
+
+(defmethod schedule ((server internal) instrument &rest rest)
+  (let ((msg (print (format nil "i~d ~{~d ~}" instrument rest))))
+    (readscore server msg)))
 
 (defmethod send ((server internal) (orchestra string))
   (csound:compile-orc (pointer server) orchestra))
