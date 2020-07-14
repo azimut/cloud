@@ -41,7 +41,7 @@
   (csound:read-score (pointer server) score))
 
 (defmethod schedule ((server internal) instrument &rest rest)
-  (let ((msg (print (format nil "i~d ~{~d ~}" instrument rest))))
+  (let ((msg (format nil "i~d ~{~d ~}" instrument rest)))
     (readscore server msg)))
 
 (defmethod send ((server internal) (orchestra string))
