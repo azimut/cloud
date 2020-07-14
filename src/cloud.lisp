@@ -45,3 +45,8 @@
                 (str:concat name extension) filepath)))
     (or (probe-file file)
         (error "file missing"))))
+
+(defun iname (instr instance)
+  "Helper to use multiple instrument instances support"
+  (parse-float:parse-float
+   (format nil "~d.~d" instr instance)))

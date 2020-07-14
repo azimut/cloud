@@ -11,6 +11,7 @@
                #:cl-arrows
                #:cl-ppcre
                #:csound
+               #:parse-float
                #:serapeum
                #:str)
   :components ((:file "package")
