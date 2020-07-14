@@ -20,15 +20,16 @@
         :documentation "audio position"))
   (:documentation "sound effect, position based hrtfmove2"))
 
-(defun format-roomless (n filename)
-  (format nil *roomless-instr* n n n n filename))
+(defmethod formatit ((obj roomless))
+  (let ((n (ninstr obj)))
+    (format nil *roomless-instr* n n n n (filename obj))))
 
 (defmethod initialize-instance :before ((obj roomless) &key pos)
   (check-type pos rtg-math.types:vec3))
 
-(defmethod initialize-instance :after ((obj roomless) &key filename)
+(defmethod initialize-instance :after ((obj roomless) &key)
   (let* ((i (ninstr obj)))
-    (setf (instr obj) (format-roomless i filename))
+    (setf (instr obj) (formatit obj))
     (init-channel (format nil "azimut~d"    i) 0.0)
     (init-channel (format nil "altitude~d"  i) 0.0)
     (init-channel (format nil "amplitude~d" i) 0.0)))

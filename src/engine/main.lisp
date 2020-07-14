@@ -1,36 +1,30 @@
 (in-package #:cloud)
 
-(defvar *file-to-instrument* (make-hash-table :test #'equal))
 (defvar *instruments* 0)
-;; TODO: restart?
-(defun ninstr-p (filename)
-  (and (gethash filename *file-to-instrument*)
-       t))
-(defun next-instrument (filename)
-  (setf (gethash filename *file-to-instrument*)
-        (or (gethash filename *file-to-instrument*)
-            (incf *instruments*))))
+
+(defun next-instrument ()
+  (incf *instruments*))
 (defun reset-instruments ()
-  (clrhash *file-to-instrument*)
   (setf *instruments* 0))
 
 (defclass audio ()
   ((filename :initarg :filename
-             :reader   filename
+             :initform nil
+             :reader filename
              :documentation "location on disk")
-   (instr    :accessor instr
-             :documentation "csound instr string")
-   (ninstr   :reader   ninstr
-             :documentation "csound instrument number"))
-  (:default-initargs
-   :filename (error ":filename must be specified"))
+   (instr    :accessor instr :type string  :documentation "csound effective instrument")
+   (ninstr   :reader  ninstr :type integer :documentation "csound instrument number"))
   (:documentation "base audio class"))
 
+(defmethod free ((obj audio))
+  (let ((msg (format nil "remove ~d" (ninstr obj))))
+    (send *server* msg)))
+
 (defmethod initialize-instance :before ((obj audio) &key filename)
-  (assert (probe-file filename))
-  (assert (str:ends-with-p "wav" filename)))
-(defmethod initialize-instance :after ((obj audio) &key filename)
-  (setf (slot-value obj 'ninstr) (next-instrument filename)))
+  (assert (or (not filename) (probe-file filename)))
+  (assert (or (not filename) (str:ends-with-p "wav" filename))))
+(defmethod initialize-instance :after ((obj audio) &key)
+  (setf (slot-value obj 'ninstr) (next-instrument)))
 
 (defmethod (setf instr) :after (new-value (obj audio))
   (send *server* new-value))
