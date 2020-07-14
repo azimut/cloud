@@ -15,7 +15,7 @@
 
 (defvar *server* "KLUDGE: global server used for some things")
 
-(defvar *csound-globals* ""
+(defvar *csound-globals*
   ";; Initialize the global variables.
    sr = 44100
    kr = 4410
