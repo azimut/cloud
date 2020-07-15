@@ -23,17 +23,6 @@
                (:file "player")
                (:file "default-instruments")))
 
-(asdf:defsystem #:cloud/scheduler
-  :description "Describe cloud here"
-  :author "azimut <azimut.github@protonmail.com>"
-  :license  "MIT"
-  :version "0.0.1"
-  :serial t
-  :pathname "src"
-  :depends-on (#:cloud
-               #:scheduler)
-  :components ((:file "scheduler")))
-
 (asdf:defsystem #:cloud/udp
   :description "Describe cloud here"
   :author "azimut <azimut.github@protonmail.com>"
