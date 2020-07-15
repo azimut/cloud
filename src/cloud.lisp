@@ -1,5 +1,10 @@
 (in-package #:cloud)
+
 ;; TODO: restart
+
+(defvar *server* nil
+  "KLUDGE: global server used for some things")
+
 (defclass csound ()
   ())
 
@@ -13,8 +18,6 @@
             :documentation "score string, has the wavetables")
    (file    :initarg :file)))
 
-(defvar *server* "KLUDGE: global server used for some things")
-
 (defvar *csound-globals*
   ";; Initialize the global variables.
    sr = 44100
@@ -23,7 +26,7 @@
    nchnls = 2")
 
 ;; JACK?
-;;(defvar *csound-options* '("-odac" "--nchnls=2" "-+rtaudio=jack" "-b128" "-B1048" "--sample-rate=44100"))
+;;(defvar *csound-options* '("-n" "-odac" "--nchnls=2" "-+rtaudio=jack" "-b128" "-B1048" "--sample-rate=44100"))
 (defvar *csound-options* '("-n" "-odac" "-m3" "--nchnls=2"))
 
 (defvar *orcs* (make-hash-table))

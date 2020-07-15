@@ -4,7 +4,7 @@
   ()
   (:documentation "background music, positionless"))
 
-(defparameter *music-instr*
+(defvar *music-instr*
   "instr ~d
      ibcount active ~d
      if (ibcount == 1) then
@@ -16,11 +16,12 @@
      endif
    endin")
 
-(defmethod initialize-instance :after ((obj music) &key filename)
-  (let* ((n (ninstr obj))
-         (i (format nil *music-instr* n n filename)))
-    (setf (slot-value obj 'instr)  i)
-    (send *server* i)))
+(defmethod formatit ((obj music))
+  (let ((n (ninstr obj)))
+    (format nil *music-instr* n n (filename obj))))
+
+(defmethod initialize-instance :after ((obj music) &key)
+  (setf (instr obj) (formatit obj)))
 
 (defun make-music (filename)
   (make-instance 'music :filename filename))

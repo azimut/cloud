@@ -4,7 +4,7 @@
 ;; hrtfearly >
 ;; TODO: amp?
 
-(defparameter *roomie-instr*
+(defvar *roomie-instr*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    instr ~d
@@ -22,7 +22,7 @@
            outs      aleft, aright
    endin")
 
-(defparameter *roomie-instr-custom*
+(defvar *roomie-instr-custom*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    instr ~d

@@ -1,6 +1,6 @@
 (in-package #:cloud)
 ;; TODO: assumes 1(one) reverb at the time
-(defparameter *roomie-room*
+(defvar *roomie-room*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    instr 1010

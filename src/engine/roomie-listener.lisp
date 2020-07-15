@@ -1,6 +1,6 @@
 (in-package #:cloud)
 
-(defparameter *roomie-listener*
+(defvar *roomie-listener*
   "gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
    instr 1001
      ibcount active 1001

@@ -9,6 +9,7 @@
 ;; http://write.flossmanuals.net/csound/web-based-csound/
 ;; https://github.com/LispCookbook/cl-cookbook/blob/95086d1f8f5d64b3c4ec83523fbaba0e1ac52447/sockets.md
 
+;; TODO: start/stop internal
 (defclass udp (csound)
   ((socket :initarg :socket :accessor socket)
    (host   :initarg :host   :reader   host)
