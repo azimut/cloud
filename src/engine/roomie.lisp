@@ -25,6 +25,7 @@
 (defvar *roomie-instr-custom*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
+   gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
    instr ~d
      kx, ky, kz, kamp init 0
      kx    chnget  \"srcx~d\"
