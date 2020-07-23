@@ -46,7 +46,7 @@ instr ~d
 
     asig, asignull fluidOut giengine~d
 
-     aleft, aright hrtfmove2 (asig * imvol * kAmp), kAz, kElev, \"/home/sendai/quicklisp/local-projects/cloud/hrtf-44100-left.dat\", \"/home/sendai/quicklisp/local-projects/cloud/hrtf-44100-right.dat\"
+     aleft, aright hrtfmove2 (asig * imvol * kAmp), kAz, kElev, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\"
             outs        aleft, aright
 
    else
