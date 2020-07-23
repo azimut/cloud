@@ -49,4 +49,5 @@
                (:file "roomless")
                (:file "roomie-room")
                (:file "roomie-listener")
-               (:file "roomie")))
+               (:file "roomie")
+               (:file "fluidsynth")))
