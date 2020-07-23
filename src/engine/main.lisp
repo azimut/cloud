@@ -20,11 +20,15 @@
   (let ((msg (format nil "remove ~d" (ninstr obj))))
     (send *server* msg)))
 
+(defgeneric formatit (obj)
+  (:method (obj) ""))
+
 (defmethod initialize-instance :before ((obj audio) &key filename)
   (assert (or (not filename) (probe-file filename)))
   (assert (or (not filename) (str:ends-with-p "wav" filename))))
 (defmethod initialize-instance :after ((obj audio) &key)
-  (setf (slot-value obj 'ninstr) (next-instrument)))
+  (setf (slot-value obj 'ninstr) (next-instrument))
+  (setf (instr obj) (formatit obj)))
 
 (defmethod (setf instr) :after (new-value (obj audio))
   (send *server* new-value))

@@ -20,9 +20,6 @@
   (let ((n (ninstr obj)))
     (format nil *music-instr* n n (filename obj))))
 
-(defmethod initialize-instance :after ((obj music) &key)
-  (setf (instr obj) (formatit obj)))
-
 (defun make-music (filename)
   (make-instance 'music :filename filename))
 
