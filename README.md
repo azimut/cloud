@@ -29,6 +29,13 @@ CLOUD> (sco (merge-orcs (get-orchestra :kkel) (get-orchestra :xanadu)))
 CLOUD> (list-orcs)
 (:DRUMKIT :BASS :ASYNTH :KKEL :TRAPPED :XANADU)
 ```
+* udp.lisp: connect to an external csound server through UDP, use instead of internal
+
+```
+CLOUD> (setf *server* (make-instance 'udp))
+CLOUD> (connect *server*)
+????
+```
 
 ## TODO
 - Add guards/types? for the arguments to avoid float overflows or crashes
