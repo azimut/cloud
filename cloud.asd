@@ -8,7 +8,7 @@
   :serial t
   :pathname "src"
   :depends-on (#:alexandria
-               #:cl-arrows
+               #:arrows
                #:cl-ppcre
                #:csound
                #:parse-float
