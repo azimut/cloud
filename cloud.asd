@@ -50,4 +50,7 @@
                (:file "roomie-room")
                (:file "roomie-listener")
                (:file "roomie")
-               (:file "fluidsynth")))
+               (:file "fluidsynth/engine")
+               (:file "fluidsynth/engine-roomless")
+               (:file "fluidsynth/engine-roomie")
+               (:file "fluidsynth/instrument")))
