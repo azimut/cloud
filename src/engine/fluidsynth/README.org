@@ -1,0 +1,13 @@
+* Usage
+
+1. Create an engine, which will be a sound source.
+2. Create a instrument which will play on the engine.
+3. Change the position of the engine.
+4. Schedule the instrument.
+
+#+begin_src
+(defvar *engine* (make-roomless-engine "CTK-230_SoundFont.sf2" (v! 0 0 10)))
+(defvar *fluid* (make-fluidsynth *engine* 1 0 10))
+(setf (pos *engine*) (v! 0 0 2))
+(schedule *server* (ninstr *fluid*) 0 .5 60 80)
+#+end_src
