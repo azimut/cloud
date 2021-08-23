@@ -5,7 +5,7 @@ giengine~d fluidEngine
 gisfnum~d  fluidLoad   ~s, giengine~d, 1
 
 instr ~d
-  imvol init 7
+  imvol init 10
   ibcount active ~d
   if (ibcount == 1) then
      kAz           chnget    \"azimut~d\"

@@ -1,16 +1,15 @@
 (in-package #:cloud)
 
 (defclass fluidsynth (audio)
-  ((program :type integer :initarg :program :reader program :documentation "font program number")
-   (bank    :type integer :initarg :bank    :reader bank    :documentation "font bank number")
-   (channel :type integer :initarg :channel :reader channel)
-   (engine  :type engine  :initarg :engine  :reader engine))
+  ((program :initarg :program :accessor program :documentation "font program number")
+   (bank    :initarg :bank    :accessor bank    :documentation "font bank number")
+   (channel :initarg :channel :accessor channel)
+   (engine  :initarg :engine  :reader   engine))
   (:default-initargs
    :engine (error "needs an engine to get IO"))
   (:documentation "creates a new intr that plays on the ENGINE in the given CHANNEL"))
 
 (defparameter *fluid-instr* "
-fluidProgramSelect giengine~d, ~d, gisfnum~d, ~d, ~d
 massign 1,~d
 instr ~d
   mididefault   60, p3
@@ -20,19 +19,33 @@ instr ~d
   fluidNote giengine~d, ~d, ikey, ivel
 endin")
 
+(defmethod print-object ((obj fluidsynth) stream)
+  (print-unreadable-object (obj stream :type T :identity T)
+    (with-slots (program bank channel) obj
+      (format stream "PROGRAM:~a CHAN:~a BANK:~a" program channel bank))))
+
+(defmethod program-select ((obj fluidsynth))
+  (with-slots (engine bank channel program) obj
+    (with-slots (ninstr) engine
+      (send *server* (format nil "fluidProgramSelect giengine~d, ~d, gisfnum~d, ~d, ~d"
+                             ninstr channel ninstr bank program)))))
+
+(defmethod (setf channel) :after (_ (obj fluidsynth)) (program-select obj))
+(defmethod (setf program) :after (_ (obj fluidsynth)) (program-select obj))
+(defmethod (setf bank)    :after (_ (obj fluidsynth)) (program-select obj))
+
 (defmethod initialize-instance :before ((obj fluidsynth) &key engine channel bank program)
   (check-type engine  engine)
   (check-type channel integer)
   (check-type program integer)
   (check-type bank    integer))
 
+(defmethod initialize-instance :after ((obj fluidsynth) &key)
+  (program-select obj))
+
 (defmethod formatit ((obj fluidsynth))
   (with-slots (engine bank program channel) obj
-    (format nil *fluid-instr*
-            (ninstr engine) channel (ninstr engine) bank program
-            (ninstr obj) (ninstr obj) (ninstr engine) channel)))
+    (format nil *fluid-instr* (ninstr obj) (ninstr obj) (ninstr engine) channel)))
 
 (defun make-fluidsynth (engine &optional (channel 1) (bank 0) (program 0))
   (make-instance 'fluidsynth :engine engine :channel channel :bank bank :program program))
-
-

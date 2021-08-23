@@ -17,7 +17,9 @@ endin")
 
 ;; inherith from audio?
 (defclass engine (audio)
-  ((sf2 :type string  :reader sf2 :initarg :sf2 :documentation "path to font")))
+  ((sf2 :reader sf2 :initarg :sf2 :documentation "path to font"))
+  (:default-initargs
+   :sf2 (error ".SF2 path not provided")))
 
 (defmethod initialize-instance :before ((obj engine) &key sf2)
   (assert (and (uiop:file-exists-p sf2) (str:ends-with-p ".sf2" sf2))))
@@ -30,5 +32,3 @@ endin")
 
 (defun make-engine (sf2)
   (make-instance 'engine :sf2 sf2))
-
-
