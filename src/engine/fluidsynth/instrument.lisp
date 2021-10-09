@@ -1,8 +1,8 @@
 (in-package #:cloud)
 
 (defclass fluidsynth (instrument)
-  ((program :initarg :program :accessor program :documentation "font program number")
-   (bank    :initarg :bank    :accessor bank    :documentation "font bank number")
+  ((program :initarg :program :accessor program)
+   (bank    :initarg :bank    :accessor bank)
    (channel :initarg :channel :accessor channel)
    (engine  :initarg :engine  :reader   engine))
   (:default-initargs
@@ -10,14 +10,16 @@
   (:documentation "creates a new intr that plays on the ENGINE in the given CHANNEL"))
 
 (defparameter *fluid-instr* "
-massign 1,~d
-instr ~d
-  mididefault   60, p3
-  midinoteonkey p4, p5
-  ikey init p4
-  ivel init p5
-  fluidNote giengine~d, ~d, ikey, ivel
-endin")
+   massign 0,0
+   massign 1,~d
+   instr ~d
+     mididefault   60, p3
+     midinoteonkey p4, p5
+     ikey init p4
+     ivel init p5
+     fluidNote giengine~d, ~d, ikey, ivel
+   endin"
+  "fluidNote")
 
 (defmethod print-object ((obj fluidsynth) stream)
   (print-unreadable-object (obj stream :type T :identity T)
@@ -47,5 +49,5 @@ endin")
   (with-slots (engine bank program channel) obj
     (format nil *fluid-instr* (ninstr obj) (ninstr obj) (ninstr engine) channel)))
 
-(defun make-fluidsynth (engine &optional (channel 1) (bank 0) (program 0))
+(defun make-fluidsynth (engine &key (channel 1) (bank 0) (program 0))
   (make-instance 'fluidsynth :engine engine :channel channel :bank bank :program program))

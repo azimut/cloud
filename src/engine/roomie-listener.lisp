@@ -1,5 +1,7 @@
 (in-package #:cloud)
 
+(defclass listener () ())
+
 (defvar *roomie-listener*
   "gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
    instr 1001
@@ -19,9 +21,6 @@
      endif
    endin"
   "Instrument to constantly smooth listener params. Audio glitches otherwise.")
-
-(defclass listener ()
-  ())
 
 (defmethod initialize-instance :after ((obj listener) &key)
   (init-channel "lisx" 0.0)

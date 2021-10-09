@@ -4,6 +4,13 @@
 ;; hrtfearly >
 ;; TODO: amp?
 
+(defclass roomie (instrument roomie-room listener)
+  ((pos :initarg :pos
+        :accessor pos
+        :initform (v! 0 0 0)
+        :documentation "3d position"))
+  (:documentation "room based sound effect"))
+
 (defvar *roomie-instr*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
@@ -18,11 +25,11 @@
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
      gamain = asig * p7 + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", ~d
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, ~s, ~s, ~d
            outs      aleft, aright
    endin")
 
-(defvar *roomie-instr-custom*
+(defparameter *roomie-instr-custom*
   "gamain init 0
    gimfp, gilowrt60, gihighrt60 init 0
    gklisxSmooth, gklisySmooth, gkliszSmooth, gklisdirSmooth init 0
@@ -37,16 +44,9 @@
      kSrcz port    kz, .025
      asig  diskin2 ~s, p4, p5, p6, 0, 32
      gamain = asig * p7 + gamain
-     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\", 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
+     aleft, aright, gilowrt60, gihighrt60, gimfp hrtfearly asig * p7, kSrcx, kSrcy, kSrcz, gklisxSmooth, gklisySmooth, gkliszSmooth, ~s, ~s, 0, 8, 44100, ~d, 1, gklisdirSmooth, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f, ~f
            outs      aleft, aright
    endin")
-
-(defclass roomie (audio roomie-room listener)
-  ((pos :initarg :pos
-        :accessor pos
-        :initform (v! 0 0 0)
-        :documentation "3d position"))
-  (:documentation "room based sound effect"))
 
 (defun make-roomie (filename)
   (make-instance 'roomie :filename filename :room-type :small))
@@ -55,6 +55,7 @@
   (let ((n (ninstr obj)))
     (case (room-type obj)
       (:custom (format nil *roomie-instr-custom* n n n n n (filename obj)
+                       (hrtf-left) (hrtf-right)
                        (slot-value obj 'order)
                        (x (room-size obj))
                        (z (room-size obj))
@@ -74,7 +75,7 @@
                        (slot-value obj 'ceil-gain1)
                        (slot-value obj 'ceil-gain2)
                        (slot-value obj 'ceil-gain3)))
-      (t (format nil *roomie-instr* n n n n n (filename obj) (room-type obj))))))
+      (t (format nil *roomie-instr* n n n n n (filename obj) (hrtf-left) (hrtf-right) (room-type obj))))))
 
 (defmethod initialize-instance :after ((obj roomie) &key filename room-type room-size)
   (let ((n (ninstr obj)))

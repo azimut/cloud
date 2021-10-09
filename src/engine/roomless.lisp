@@ -1,5 +1,15 @@
 (in-package #:cloud)
 
+(defclass roomless (instrument)
+  ((pos       :initarg  :pos
+              :accessor pos
+              :initform (v! 0 0 0)
+              :documentation "audio position")
+   (azimut    :accessor azimut)
+   (altitude  :accessor altitude)
+   (amplitude :accessor amplitude))
+  (:documentation "sound source effect, position based hrtfmove2"))
+
 (defparameter *roomless-instr*
   "instr ~d
      kAz           chnget    \"azimut~d\"
@@ -10,16 +20,6 @@
                    outs      aleft * p7, aright * p7
    endin"
   "diskin2 => hrtfmove2 => outs")
-
-(defclass roomless (instrument)
-  ((pos       :initarg  :pos
-              :accessor pos
-              :initform (v! 0 0 0)
-              :documentation "audio position")
-   (azimut    :accessor azimut)
-   (altitude  :accessor altitude)
-   (amplitude :accessor amplitude))
-  (:documentation "sound source effect, position based hrtfmove2"))
 
 (defun make-roomless (filename pos)
   (make-instance 'roomless :filename filename :pos pos))
@@ -37,11 +37,12 @@
 (defmethod initialize-instance :before ((obj roomless) &key pos)
   (check-type pos rtg-math.types:vec3))
 
-(defmethod initialize-instance :after ((obj roomless) &key)
+(defmethod initialize-instance :after ((obj roomless) &key pos)
   (with-slots ((i ninstr)) obj
     (init-channel (format nil "azimut~d"    i) 0.0)
     (init-channel (format nil "altitude~d"  i) 0.0)
-    (init-channel (format nil "amplitude~d" i) 0.0)))
+    (init-channel (format nil "amplitude~d" i) 0.0))
+  (setf (pos obj) pos))
 
 (defun rot-x (q)
   "returns the EULER rotation in X from quaternion Q"
