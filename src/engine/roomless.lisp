@@ -1,8 +1,6 @@
 (in-package #:cloud)
 
-;; TODO: free instrument?
-
-(defvar *roomless-instr*
+(defparameter *roomless-instr*
   "instr ~d
      kAz           chnget    \"azimut~d\"
      kElev         chnget    \"altitude~d\"
@@ -11,14 +9,26 @@
      aleft, aright hrtfmove2 (asig * kAmp), kAz, kElev, \"hrtf-44100-left.dat\", \"hrtf-44100-right.dat\"
                    outs      aleft * p7, aright * p7
    endin"
-  "diskin2 > hrtfmove2 = out")
+  "diskin2 => hrtfmove2 => outs")
 
 (defclass roomless (audio)
-  ((pos :initarg :pos
-        :accessor pos
-        :initform (v! 0 0 0)
-        :documentation "audio position"))
-  (:documentation "sound effect, position based hrtfmove2"))
+  ((pos       :initarg  :pos
+              :accessor pos
+              :initform (v! 0 0 0)
+              :documentation "audio position")
+   (azimut    :accessor azimut)
+   (altitude  :accessor altitude)
+   (amplitude :accessor amplitude))
+  (:documentation "sound source effect, position based hrtfmove2"))
+
+(defun make-roomless (filename pos)
+  (make-instance 'roomless :filename filename :pos pos))
+
+(defmethod print-object ((obj roomless) stream)
+  (print-unreadable-object (obj stream :type T :identity T)
+    (with-slots (pos azimut altitude amplitude) obj
+      (format stream "(~,2f ~,2f ~,2f) ~,2f/~,2f/~,2f"
+              (x pos) (y pos) (z pos) azimut altitude amplitude))))
 
 (defmethod formatit ((obj roomless))
   (let ((n (ninstr obj)))
@@ -28,14 +38,10 @@
   (check-type pos rtg-math.types:vec3))
 
 (defmethod initialize-instance :after ((obj roomless) &key)
-  (let* ((i (ninstr obj)))
-    (setf (instr obj) (formatit obj))
+  (with-slots ((i ninstr)) obj
     (init-channel (format nil "azimut~d"    i) 0.0)
     (init-channel (format nil "altitude~d"  i) 0.0)
     (init-channel (format nil "amplitude~d" i) 0.0)))
-
-(defun make-roomless (filename pos)
-  (make-instance 'roomless :filename filename :pos pos))
 
 (defun rot-x (q)
   "returns the EULER rotation in X from quaternion Q"
@@ -67,9 +73,16 @@
                   (expt (- (y source-pos) (y listener-pos)) 2)
                   (expt (- (z source-pos) (z listener-pos)) 2))))))
 
+(defmethod (setf azimut) :after (new-value (obj roomless))
+  (set-channel (format nil "azimut~d" (ninstr obj)) new-value))
+(defmethod (setf altitud) :after (new-value (obj roomless))
+  (set-channel (format nil "altitud~d" (ninstr obj)) new-value))
+(defmethod (setf amplitude) :after (new-value (obj roomless))
+  (set-channel (format nil "amplitude~d" (ninstr obj)) new-value))
+
 (defmethod (setf pos) :after (new-pos (obj roomless))
   (let ((lpos (get-listener-pos))
         (lrot (get-listener-rot)))
-    (set-channel (format nil "azimut~d"    (ninstr obj)) (compute-azimut    new-pos lpos lrot))
-    (set-channel (format nil "altitude~d"  (ninstr obj)) (compute-altitude  new-pos lpos lrot))
-    (set-channel (format nil "amplitude~d" (ninstr obj)) (compute-amplitude new-pos lpos))))
+    (setf (azimut obj)    (compute-azimut    new-pos lpos lrot))
+    (setf (altitude obj)  (compute-altitude  new-pos lpos lrot))
+    (setf (amplitude obj) (compute-amplitude new-pos lpos))))
