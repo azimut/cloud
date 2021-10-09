@@ -44,6 +44,7 @@
   :depends-on (#:cloud/udp
                #:rtg-math)
   :components ((:file "package")
+               (:file "instrument")
                (:file "main")
                (:file "music")
                (:file "roomless")

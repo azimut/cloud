@@ -1,6 +1,6 @@
 (in-package #:cloud)
 
-(defclass music (audio)
+(defclass music (instrument)
   ()
   (:documentation "background music, positionless"))
 

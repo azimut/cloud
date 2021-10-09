@@ -1,6 +1,6 @@
 (in-package #:cloud)
 
-(defclass fluidsynth (audio)
+(defclass fluidsynth (instrument)
   ((program :initarg :program :accessor program :documentation "font program number")
    (bank    :initarg :bank    :accessor bank    :documentation "font bank number")
    (channel :initarg :channel :accessor channel)

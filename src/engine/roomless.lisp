@@ -11,7 +11,7 @@
    endin"
   "diskin2 => hrtfmove2 => outs")
 
-(defclass roomless (audio)
+(defclass roomless (instrument)
   ((pos       :initarg  :pos
               :accessor pos
               :initform (v! 0 0 0)

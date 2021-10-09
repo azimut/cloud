@@ -15,14 +15,13 @@ instr ~d
    endif
 endin")
 
-;; inherith from audio?
-(defclass engine (audio)
-  ((sf2 :reader sf2 :initarg :sf2 :documentation "path to font"))
-  (:default-initargs
-   :sf2 (error ".SF2 path not provided")))
+;; TODO: inherith from audio?
+(defclass engine (instrument)
+  ((sf2 :initform (error ".SF2 path not provided") :reader sf2 :initarg :sf2)))
 
 (defmethod initialize-instance :before ((obj engine) &key sf2)
-  (assert (and (uiop:file-exists-p sf2) (str:ends-with-p ".sf2" sf2))))
+  (assert (and (uiop:file-exists-p sf2)
+               (str:ends-with-p ".sf2" (str:downcase sf2)))))
 (defmethod initialize-instance :after ((obj engine) &key)
   (schedule *server* (ninstr obj) 0 -1))
 
